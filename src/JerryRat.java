@@ -22,7 +22,6 @@ public class JerryRat implements Runnable {
             ) {
                 String request = in.readLine();
                 while (request != null) {
-                    BufferedReader htmlReader;
                     String[] requestPart = request.split(" ");
                     String get = requestPart[0].toLowerCase();
                     if (!get.equals("get")) {
@@ -52,6 +51,6 @@ public class JerryRat implements Runnable {
 
     public static void main(String[] args) throws IOException {
         JerryRat jerryRat = new JerryRat();
-        new Thread(jerryRat).start();
+        new Thread(jerryRat).run();
     }
 }
