@@ -21,7 +21,7 @@ public class JerryRat implements Runnable {
             ) {
                 String request = in.readLine();
                 while (request != null) {
-                    BufferedReader htmlReader = null;
+                    BufferedReader htmlReader;
                     String[] requestPart = request.split(" ");
                     String get = requestPart[0].toLowerCase();
                     if (!get.equals("get")) {
@@ -37,7 +37,7 @@ public class JerryRat implements Runnable {
                     }
                     out.println(htmlReader.readLine());
                     htmlReader.close();
-                    request = in.readLine();
+                    request = null;
                 }
             } catch (IOException e) {
                 System.err.println("TCP连接错误！");
