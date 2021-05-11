@@ -30,11 +30,11 @@ public class JerryRat implements Runnable {
                         File file = new File("res/webroot" + resource);
                         if (file.isFile()) {
                             htmlReader = new BufferedReader(new FileReader(file));
-                            out.println(htmlReader.readLine());
-                        }else {
+                            out.println(htmlReader.read());
+                        } else {
                             File file1 = new File("res/webroot" + "/foo");
                             htmlReader = new BufferedReader(new FileReader(file1));
-                            out.println(htmlReader.readLine());
+                            out.println(htmlReader.read());
                         }
                     }
                     htmlReader.close();
