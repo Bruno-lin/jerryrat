@@ -21,13 +21,16 @@ public class EchoServer implements Runnable {
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
         ) {
             String line;
+            int i = 0;
             while ((line = in.readLine()) != null) {
-                switch (line) {
-                    case "hello" -> out.println("1. hello");
-                    case "world" -> out.println("2. world");
-                    case "你好" -> out.println("3. 你好");
-                    case "吗？" -> out.println("4. 吗？");
-                }
+                i++;
+                out.println(i+". "+line);
+//                switch (line) {
+//                    case "hello" -> out.println("1. hello");
+//                    case "world" -> out.println("2. world");
+//                    case "你好" -> out.println("3. 你好");
+//                    case "吗？" -> out.println("4. 吗？");
+//                }
             }
         } catch (IOException e) {
             System.err.println("TCP连接错误！");
