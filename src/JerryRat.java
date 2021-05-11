@@ -21,24 +21,22 @@ public class JerryRat implements Runnable {
             ) {
                 String request = in.readLine();
                 BufferedReader htmlReader = null;
-                while (request != null) {
-                    String[] requestPart = request.split(" ");
-                    String get = requestPart[0].toLowerCase();
-                    String resource = requestPart[1];
-                    if (get.equals("get")) {
-                        File file = new File("res/webroot" + resource);
-                        if (file.isFile()) {
-                            htmlReader = new BufferedReader(new FileReader(file));
-                        } else {
-                            File file1 = new File("res/webroot" + "/index.html");
-                            htmlReader = new BufferedReader(new FileReader(file1));
-                        }
-                        out.println(htmlReader.readLine());
+                String[] requestPart = request.split(" ");
+                String get = requestPart[0].toLowerCase();
+                String resource = requestPart[1];
+                if (get.equals("get")) {
+                    File file = new File("res/webroot" + resource);
+                    if (file.isFile()) {
+                        htmlReader = new BufferedReader(new FileReader(file));
+                    } else {
+                        File file1 = new File("res/webroot" + "/index.html");
+                        htmlReader = new BufferedReader(new FileReader(file1));
                     }
-                    assert htmlReader != null;
-                    htmlReader.close();
-                    request = in.readLine();
+                    out.println(htmlReader.readLine());
                 }
+                out.close();
+                in.close();
+                htmlReader.close();
             } catch (IOException e) {
                 System.err.println("TCP连接错误！");
             }
