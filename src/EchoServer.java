@@ -18,19 +18,16 @@ public class EchoServer implements Runnable {
         try (
                 Socket clientSocket = serverSocket.accept();
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
         ) {
-            if (in.readLine().equals("hello")) {
-                out.println("1. hello");
-            }
-            if (in.readLine().equals("world")) {
-                out.println("2. world");
-            }
-            if (in.readLine().equals("你好")) {
-                out.println("3. 你好");
-            }
-            if (in.readLine().equals("吗？")) {
-                out.println("4. 吗？");
+            String line;
+            while ((line = in.readLine()) != null) {
+                switch (line) {
+                    case "hello" -> out.println("1. hello");
+                    case "world" -> out.println("2. world");
+                    case "你好" -> out.println("3. 你好");
+                    case "吗？" -> out.println("4. 吗？");
+                }
             }
         } catch (IOException e) {
             System.err.println("TCP连接错误！");
