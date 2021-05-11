@@ -20,19 +20,17 @@ public class EchoServer implements Runnable {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         ) {
-            while (in.readLine() != null) {
-                if (in.readLine().equals("hello")) {
-                    out.println("1. hello");
-                }
-                if (in.readLine().equals("world")) {
-                    out.println("2. world");
-                }
-                if (in.readLine().equals("你好")) {
-                    out.println("3. 你好");
-                }
-                if (in.readLine().equals("吗？")) {
-                    out.println("4. 吗？");
-                }
+            if (in.readLine().equals("hello")) {
+                out.println("1. hello");
+            }
+            if (in.readLine().equals("world")) {
+                out.println("2. world");
+            }
+            if (in.readLine().equals("你好")) {
+                out.println("3. 你好");
+            }
+            if (in.readLine().equals("吗？")) {
+                out.println("4. 吗？");
             }
         } catch (IOException e) {
             System.err.println("TCP连接错误！");
