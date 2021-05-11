@@ -20,11 +20,14 @@ public class JerryRat implements Runnable {
                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ) {
                 String request = in.readLine();
-                BufferedReader htmlReader = null;
-                String[] requestPart = request.split(" ");
-                String get = requestPart[0].toLowerCase();
-                String resource = requestPart[1];
-                if (get.equals("get")) {
+                while (request != null) {
+                    BufferedReader htmlReader = null;
+                    String[] requestPart = request.split(" ");
+                    String get = requestPart[0].toLowerCase();
+                    if (!get.equals("get")) {
+                        break;
+                    }
+                    String resource = requestPart[1];
                     File file = new File("res/webroot" + resource);
                     if (file.isFile()) {
                         htmlReader = new BufferedReader(new FileReader(file));
@@ -33,10 +36,8 @@ public class JerryRat implements Runnable {
                         htmlReader = new BufferedReader(new FileReader(file1));
                     }
                     out.println(htmlReader.readLine());
+                    htmlReader.close();
                 }
-                out.close();
-                in.close();
-                htmlReader.close();
             } catch (IOException e) {
                 System.err.println("TCP连接错误！");
             }
