@@ -5,6 +5,7 @@ import java.net.Socket;
 public class JerryRat implements Runnable {
 
     public static final String SERVER_PORT = "8080";
+    public static final String WEB_ROOT = "res/webroot";
     ServerSocket serverSocket;
 
     public JerryRat() throws IOException {
@@ -28,21 +29,25 @@ public class JerryRat implements Runnable {
                         break;
                     }
                     String resource = requestPart[1];
-                    File file = new File("res/webroot" + resource);
+                    File file = new File(WEB_ROOT + resource);
                     if (file.isFile()) {
-                        htmlReader = new BufferedReader(new FileReader(file));
+                        FileReader fr = new FileReader(file);
+                        char[] contents = new char[(int) file.length()];
+                        fr.read(contents);
+                        out.println(String.valueOf(contents));
                     } else {
-                        File file1 = new File("res/webroot" + "/index.html");
-                        htmlReader = new BufferedReader(new FileReader(file1));
+                        FileReader fr = new FileReader(WEB_ROOT + "index.html");
+                        char[] contents = new char[(int) file.length()];
+                        fr.read(contents);
+                        out.println(String.valueOf(contents));
                     }
-                    out.println(htmlReader.readLine());
-                    htmlReader.close();
-                    request = null;
+                    request = in.readLine();
                 }
             } catch (IOException e) {
                 System.err.println("TCP连接错误！");
             }
         }
+
     }
 
     public static void main(String[] args) throws IOException {
