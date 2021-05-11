@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Locale;
 
 public class JerryRat implements Runnable {
 
@@ -14,43 +15,44 @@ public class JerryRat implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        while (true){
             try (
                     Socket clientSocket = serverSocket.accept();
                     PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
+                    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             ) {
                 String request = in.readLine();
                 while (request != null) {
-                    String[] requestPart = request.split(" ");
-                    String get = requestPart[0].toLowerCase();
-                    if (!get.equals("get")) {
+                    String[] req = request.split(" ");
+                    String requestMethod = req[0];
+                    if (!requestMethod.toLowerCase(Locale.ROOT).equals("get")) {
                         break;
                     }
-                    String resource = requestPart[1];
-                    File file = new File(WEB_ROOT + resource);
-                    if (file.isFile()) {
-                        FileReader fr = new FileReader(file);
-                        char[] contents = new char[(int) file.length()];
-                        fr.read(contents);
-                        out.println(String.valueOf(contents));
+                    String requestPath = req[1];
+                    File requestFile = new File(WEB_ROOT + requestPath);
+                    if (requestFile.isDirectory()) {
+                        requestFile = new File(requestFile, "/index.html");
+                        FileReader fos = new FileReader(requestFile);
+                        char[] content = new char[(int) requestFile.length()];
+                        fos.read(content);
+                        out.println(String.valueOf(content));
                     } else {
-                        FileReader fr = new FileReader(WEB_ROOT + "index.html");
-                        char[] contents = new char[(int) file.length()];
-                        fr.read(contents);
-                        out.println(String.valueOf(contents));
+                        FileReader fos = new FileReader(requestFile);
+                        char[] content = new char[(int) requestFile.length()];
+                        fos.read(content);
+                        out.println(String.valueOf(content));
                     }
                     request = in.readLine();
                 }
             } catch (IOException e) {
+                e.printStackTrace();
                 System.err.println("TCP连接错误！");
             }
         }
-
     }
 
     public static void main(String[] args) throws IOException {
         JerryRat jerryRat = new JerryRat();
-        new Thread(jerryRat).run();
+        new Thread(jerryRat).start();
     }
 }
