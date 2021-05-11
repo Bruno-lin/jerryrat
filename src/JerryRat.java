@@ -13,26 +13,28 @@ public class JerryRat implements Runnable {
 
     @Override
     public void run() {
-        try (
-                Socket clientSocket = serverSocket.accept();
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
-        ) {
-            String request = in.readLine();
-            while (request != null) {
-                String[] requestPart = request.split(" ");
-                String get = requestPart[0].toLowerCase();
-                String resource = requestPart[1];
-                if (get.equals("get") && (resource.equals("/res/webroot") || resource.equals("/foo"))) {
-                    File file = new File("res/webroot/foo");
-                    BufferedReader htmlReader = new BufferedReader(new FileReader(file));
-                    out.println(htmlReader.readLine());
-                    request = in.readLine();
-                } else
-                    break;
+        while (true) {
+            try (
+                    Socket clientSocket = serverSocket.accept();
+                    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
+            ) {
+                String request = in.readLine();
+                while (request != null) {
+                    String[] requestPart = request.split(" ");
+                    String get = requestPart[0].toLowerCase();
+                    String resource = requestPart[1];
+                    if (get.equals("get") && (resource.equals("/res/webroot") || resource.equals("/foo"))) {
+                        File file = new File("res/webroot/foo");
+                        BufferedReader htmlReader = new BufferedReader(new FileReader(file));
+                        out.println(htmlReader.readLine());
+                        request = null;
+                    } else
+                        break;
+                }
+            } catch (IOException e) {
+                System.err.println("TCP连接错误！");
             }
-        } catch (IOException e) {
-            System.err.println("TCP连接错误！");
         }
     }
 

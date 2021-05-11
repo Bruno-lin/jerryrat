@@ -34,6 +34,6 @@ public class EchoServer implements Runnable {
 
     public static void main(String[] args) throws IOException {
         EchoServer echoServer = new EchoServer();
-        new Thread(echoServer).run();
+        new Thread(echoServer).start();
     }
 }
