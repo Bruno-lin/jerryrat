@@ -15,17 +15,17 @@ public class JerryRat implements Runnable {
 
     @Override
     public void run() {
-        while (true){
+        while (true) {
             try (
                     Socket clientSocket = serverSocket.accept();
                     PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ) {
                 String request = in.readLine();
                 while (request != null) {
                     String[] req = request.split(" ");
-                    String requestMethod = req[0];
-                    if (!requestMethod.toLowerCase(Locale.ROOT).equals("get")) {
+                    String get = req[0].toLowerCase();
+                    if (!get.equals("get")) {
                         break;
                     }
                     String requestPath = req[1];
