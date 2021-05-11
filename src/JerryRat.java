@@ -37,6 +37,7 @@ public class JerryRat implements Runnable {
                     }
                     out.println(htmlReader.readLine());
                     htmlReader.close();
+                    request = in.readLine();
                 }
             } catch (IOException e) {
                 System.err.println("TCP连接错误！");
