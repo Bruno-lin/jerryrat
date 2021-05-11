@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class JerryRat implements Runnable {
 
@@ -20,17 +21,24 @@ public class JerryRat implements Runnable {
                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ) {
                 String request = in.readLine();
+                BufferedReader htmlReader = null;
                 while (request != null) {
                     String[] requestPart = request.split(" ");
                     String get = requestPart[0].toLowerCase();
                     String resource = requestPart[1];
-                    if (get.equals("get") && (resource.equals("/res/webroot") || resource.equals("/foo"))) {
-                        File file = new File("res/webroot/foo");
-                        BufferedReader htmlReader = new BufferedReader(new FileReader(file));
-                        out.println(htmlReader.readLine());
-                        request = null;
-                    } else
-                        break;
+                    if (get.equals("get")) {
+                        File file = new File("res/webroot" + resource);
+                        if (file.isFile()) {
+                            htmlReader = new BufferedReader(new FileReader(file));
+                            out.println(htmlReader.readLine());
+                        }else {
+                            File file1 = new File("res/webroot" + "/foo");
+                            htmlReader = new BufferedReader(new FileReader(file1));
+                            out.println(htmlReader.readLine());
+                        }
+                    }
+                    htmlReader.close();
+                    request = null;
                 }
             } catch (IOException e) {
                 System.err.println("TCP连接错误！");
