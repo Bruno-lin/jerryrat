@@ -45,7 +45,7 @@ public class JerryRat implements Runnable {
                 byte[] entityBody = getEntityBody(file);
 
                 out.println("\r\n" + responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
-
+                out.flush();
             } catch (IOException e) {
                 e.printStackTrace();
                 System.err.println("TCP连接错误！");
