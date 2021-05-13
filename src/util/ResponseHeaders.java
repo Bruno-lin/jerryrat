@@ -1,10 +1,7 @@
 package util;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 public class ResponseHeaders {
     //headers content
@@ -58,8 +55,8 @@ public class ResponseHeaders {
         this.lastModified = "Last-Modified: " + getDate(date);
     }
 
-    public String getDate(Date date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+    String getDate(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         return dateFormat.format(date);
     }
