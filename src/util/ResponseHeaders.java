@@ -46,7 +46,7 @@ public class ResponseHeaders {
         this.statusLine = "HTTP/1.0 " + statusCode;
     }
 
-    public void setContentLength(String contentLength) {
+    public void setContentLength(int contentLength) {
         this.contentLength = "Content-Length: " + contentLength;
     }
 

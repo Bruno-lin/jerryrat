@@ -68,11 +68,16 @@ public class JerryRat implements Runnable {
         return file;
     }
 
-    private byte[] getEntity(File file) throws Exception {
-        byte[] entityBody = Files.readAllBytes(file.toPath());
-        responseHeaders.setContentLength(String.valueOf(entityBody.length));
-        responseHeaders.setLastModified(new Date(file.lastModified()));
-        responseHeaders.setContentType(getContentType(file.getName()));
+    private byte[] getEntity(File file) {
+        byte[] entityBody = null;
+        try {
+            entityBody = Files.readAllBytes(file.toPath());
+            responseHeaders.setLastModified(new Date(file.lastModified()));
+            responseHeaders.setContentLength(entityBody.length);
+            responseHeaders.setContentType(getContentType(file.getName()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return entityBody;
     }
 
