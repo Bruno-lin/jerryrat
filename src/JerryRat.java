@@ -3,7 +3,6 @@ import util.ResponseHeaders;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 
@@ -48,7 +47,7 @@ public class JerryRat implements Runnable {
                     String value = headerLine[1].trim();
 
                     responseHeaders.setContentType(condition.getContentType(".txt"));
-                    responseHeaders.setContentLength(value.getBytes(StandardCharsets.UTF_8).length);
+                    responseHeaders.setContentLength(value.length());
                     responseHeaders.setLastModified(new Date());
                     responseHeaders.setStatusLine("200 OK");
 
