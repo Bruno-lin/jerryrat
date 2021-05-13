@@ -15,10 +15,9 @@ public class Condition {
     //获取文件
     File getFile(String requestPart) {
         //中文解码
-        String encoded = requestPart;
-        requestPart = URLDecoder.decode(encoded, StandardCharsets.UTF_8);
+        String decoded = URLDecoder.decode(requestPart, StandardCharsets.UTF_16);
 
-        File file = new File(JerryRat.WEB_ROOT + requestPart);
+        File file = new File(JerryRat.WEB_ROOT + decoded);
         if (!file.isFile()) {
             file = new File(file + "/index.html");
         }
@@ -27,10 +26,8 @@ public class Condition {
 
     //请求不合法
     boolean requestIllegal(String[] requestParts) {
-        return requestParts.length != 3 ||
-                !requestParts[0].equalsIgnoreCase("GET") ||
-                (!requestParts[2].equalsIgnoreCase("HTTP/1.0") &&
-                        notOldVersion(requestParts[2]));
+        return requestParts.length < 2 ||
+                !requestParts[0].equalsIgnoreCase("GET");
     }
 
     //获取文件的内容类型
@@ -80,8 +77,8 @@ public class Condition {
         return entityBody;
     }
 
-    //是否为http0.9
-    boolean notOldVersion(String requestPart) {
-        return !requestPart.equalsIgnoreCase("HTTP/0.9");
+    //是否为HTTP 1.0
+    boolean httpLatest(String requestPart) {
+        return requestPart.equalsIgnoreCase("HTTP/1.0");
     }
 }
