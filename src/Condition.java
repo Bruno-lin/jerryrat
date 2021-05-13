@@ -15,9 +15,10 @@ public class Condition {
     //获取文件
     File getFile(String requestPart) {
         //中文解码
-        String decoded = URLDecoder.decode(requestPart, StandardCharsets.UTF_16);
+        String encoded = requestPart;
+        requestPart = URLDecoder.decode(encoded, StandardCharsets.UTF_8);
 
-        File file = new File(JerryRat.WEB_ROOT + decoded);
+        File file = new File(JerryRat.WEB_ROOT + requestPart);
         if (!file.isFile()) {
             file = new File(file + "/index.html");
         }
