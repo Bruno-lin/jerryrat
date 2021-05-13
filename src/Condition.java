@@ -26,8 +26,9 @@ public class Condition {
 
     //请求不合法
     boolean requestIllegal(String[] requestParts) {
-        return requestParts.length < 2 ||
-                !requestParts[0].equalsIgnoreCase("GET");
+        return requestParts.length != 3 ||
+                !requestParts[0].equalsIgnoreCase("GET") ||
+                !requestParts[2].equalsIgnoreCase("HTTP/1.0");
     }
 
     //获取文件的内容类型
@@ -77,8 +78,8 @@ public class Condition {
         return entityBody;
     }
 
-    //是否为HTTP 1.0
-    boolean httpLatest(String requestPart) {
-        return requestPart.equalsIgnoreCase("HTTP/1.0");
+    //是否为HTTP 0.9
+    boolean isSimpleRequest(String[] requestParts) {
+        return requestParts.length == 2 && requestParts[0].equalsIgnoreCase("GET");
     }
 }

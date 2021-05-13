@@ -34,6 +34,15 @@ public class JerryRat implements Runnable {
                 String request = in.readLine();
                 String[] requestParts = request.trim().split("\\s+");
 
+                File file = condition.getFile(requestParts[1]);
+                byte[] entityBody = condition.getEntityBody(file, this);
+
+                if (condition.isSimpleRequest(requestParts)) {
+                    out.println(new String(entityBody));
+                    out.flush();
+                    continue;
+                }
+
                 if (condition.requestIllegal(requestParts)) {
                     responseHeaders.setStatusLine("400 Bad Request");
                     responseHeaders.setDate(new Date());
@@ -56,15 +65,7 @@ public class JerryRat implements Runnable {
                     continue;
                 }
 
-                File file = condition.getFile(requestParts[1]);
-                byte[] entityBody = condition.getEntityBody(file, this);
-
-
-                if (requestParts.length == 3 && condition.httpLatest(requestParts[2])) {
-                    out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
-                } else {
-                    out.print(new String(entityBody));
-                }
+                out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
                 out.flush();
             } catch (IOException e) {
                 e.printStackTrace();
