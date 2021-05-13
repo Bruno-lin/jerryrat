@@ -44,7 +44,7 @@ public class JerryRat implements Runnable {
                 File file = getFile(requestParts[1]);
                 byte[] entityBody = getEntityBody(file);
 
-                out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
+                out.print(responseHeaders.toString() + "\r\n" + new String(entityBody));
                 out.flush();
             } catch (IOException e) {
                 e.printStackTrace();
