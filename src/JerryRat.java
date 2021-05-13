@@ -58,7 +58,7 @@ public class JerryRat implements Runnable {
     private File getFile(String requestPart) {
         File file = new File(WEB_ROOT + requestPart);
         if (!file.isFile()) {
-            file = new File(WEB_ROOT + "/index.html");
+            file = new File(file + "/index.html");
         }
         return file;
     }
