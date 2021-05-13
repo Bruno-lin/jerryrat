@@ -60,7 +60,7 @@ public class JerryRat implements Runnable {
                 File file = condition.getFile(requestParts[1]);
                 byte[] entityBody = condition.getEntityBody(file, this);
 
-                if (!condition.isOldVersion(requestParts[2])) {
+                if (condition.notOldVersion(requestParts[2])) {
                     out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
                 } else {
                     out.print(new String(entityBody));

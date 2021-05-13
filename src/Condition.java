@@ -1,6 +1,5 @@
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -16,9 +15,10 @@ public class Condition {
     //获取文件
     File getFile(String requestPart) {
         //中文解码
-        String decoded = URLDecoder.decode(requestPart, StandardCharsets.UTF_8);
+        String encoded = requestPart;
+        requestPart = URLDecoder.decode(encoded, StandardCharsets.UTF_8);
 
-        File file = new File(JerryRat.WEB_ROOT + decoded);
+        File file = new File(JerryRat.WEB_ROOT + requestPart);
         if (!file.isFile()) {
             file = new File(file + "/index.html");
         }
@@ -30,7 +30,7 @@ public class Condition {
         return requestParts.length != 3 ||
                 !requestParts[0].equalsIgnoreCase("GET") ||
                 (!requestParts[2].equalsIgnoreCase("HTTP/1.0") &&
-                        !isOldVersion(requestParts[2]));
+                        notOldVersion(requestParts[2]));
     }
 
     //获取文件的内容类型
@@ -81,7 +81,7 @@ public class Condition {
     }
 
     //是否为http0.9
-    boolean isOldVersion(String requestPart) {
-        return requestPart.equalsIgnoreCase("HTTP/0.9");
+    boolean notOldVersion(String requestPart) {
+        return !requestPart.equalsIgnoreCase("HTTP/0.9");
     }
 }

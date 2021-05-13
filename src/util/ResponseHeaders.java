@@ -11,7 +11,6 @@ public class ResponseHeaders {
     String contentLength;
     String contentType;
     String lastModified;
-    String userAgent;
 
     //headers
     List<String> headers;
