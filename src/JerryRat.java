@@ -53,7 +53,7 @@ public class JerryRat implements Runnable {
                         responseHeaders.setLastModified(new Date());
                         responseHeaders.setStatusLine("200 OK");
                     }
-                    out.print(responseHeaders.toString() + "\r\n\r\n" + "User-Agent: " + value);
+                    out.print(responseHeaders.toString() + "\r\n\r\n" + value);
                     out.flush();
                     continue;
                 }
