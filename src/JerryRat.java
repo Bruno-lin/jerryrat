@@ -34,7 +34,7 @@ public class JerryRat implements Runnable {
                 String request = in.readLine();
                 String[] requestParts = request.split(" ");
 
-                if (requestWrong(requestParts)) {
+                if (requestIllegal(requestParts)) {
                     responseHeaders.setStatusLine("400 Bad Request");
                     responseHeaders.setDate(new Date());
                     out.println("\r\n" + responseHeaders.toString());
@@ -42,7 +42,7 @@ public class JerryRat implements Runnable {
                 }
 
                 File file = getFile(requestParts[1]);
-                byte[] entityBody = getEntity(file);
+                byte[] entityBody = getEntityBody(file);
 
                 out.println("\r\n" + responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
 
@@ -53,6 +53,7 @@ public class JerryRat implements Runnable {
         }
     }
 
+    //获取文件
     private File getFile(String requestPart) {
         File file = new File(WEB_ROOT + requestPart);
         if (!file.isFile()) {
@@ -61,7 +62,8 @@ public class JerryRat implements Runnable {
         return file;
     }
 
-    private byte[] getEntity(File file) {
+    //获取文件内容
+    private byte[] getEntityBody(File file) {
         byte[] entityBody = null;
         try {
             entityBody = Files.readAllBytes(file.toPath());
@@ -76,12 +78,14 @@ public class JerryRat implements Runnable {
         return entityBody;
     }
 
-    private boolean requestWrong(String[] requestParts) {
+    //请求不合法
+    private boolean requestIllegal(String[] requestParts) {
         return requestParts.length < 3 ||
                 !requestParts[0].equalsIgnoreCase("get") ||
                 !requestParts[2].equalsIgnoreCase("HTTP/1.0");
     }
 
+    //获取文件的内容类型
     private String getContentType(String content) throws Exception {
         Map<String, String> map = new HashMap<>();
         File file = new File("res/webroot/mime.txt");
@@ -95,10 +99,11 @@ public class JerryRat implements Runnable {
             String[] attrs = attr.split("\\s+");
             map.put(attrs[0], attrs[1]);
         }
-        return getType(content, map);
+        return matchType(content, map);
     }
 
-    private String getType(String content, Map<String, String> map) {
+    //匹配且返回对应的类型
+    private String matchType(String content, Map<String, String> map) {
         String[] name = content.split("\\.");
         String key = name[name.length - 1];
         if (map.get("." + key) == null) {
