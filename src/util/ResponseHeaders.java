@@ -23,10 +23,11 @@ public class ResponseHeaders {
         headers = new ArrayList<>();
         this.date = "Date: " + getDate(new Date());
         this.server = "Server: JerryRat";
-        this.statusLine = "HTTP/1.0 200 OK";;
+        this.statusLine = "HTTP/1.0 200 OK";
     }
 
     private void collectHeaders() {
+        headers.add(statusLine);
         headers.add(date);
         headers.add(server);
         headers.add(contentLength);
@@ -58,7 +59,7 @@ public class ResponseHeaders {
         this.lastModified = "Last-Modified: " + getDate(date);
     }
 
-    String getDate(Date date) {
+    public String getDate(Date date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         return dateFormat.format(date);

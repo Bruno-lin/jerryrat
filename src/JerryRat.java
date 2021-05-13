@@ -27,7 +27,7 @@ public class JerryRat implements Runnable {
         while (true) {
             try (
                     Socket clientSocket = serverSocket.accept();
-                    BufferedOutputStream out = new BufferedOutputStream(clientSocket.getOutputStream());
+                    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ) {
                 responseHeaders = new ResponseHeaders();
@@ -38,19 +38,14 @@ public class JerryRat implements Runnable {
                 if (requestWrong(requestParts)) {
                     responseHeaders.setStatusLine("400 Bad Request");
                     responseHeaders.setDate(new Date());
-                    out.write(responseHeaders.toString().getBytes(StandardCharsets.UTF_8));
+                    out.println(responseHeaders.toString());
                 }
 
                 File file = getFile(requestParts[1]);
                 byte[] entityBody = getEntity(file);
-                responseHeaders.setDate(new Date());
 
-                out.write(responseHeaders.toString().getBytes(StandardCharsets.UTF_8));
-
-                if (entityBody != null) {
-                    out.write("\r\n\r\n".getBytes(StandardCharsets.UTF_8));
-                    out.write(entityBody);
-                }
+                out.println(responseHeaders.toString());
+                out.println(entityBody.toString());
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -76,6 +71,8 @@ public class JerryRat implements Runnable {
             responseHeaders.setLastModified(new Date(file.lastModified()));
             responseHeaders.setContentLength(entityBody.length);
             responseHeaders.setContentType(getContentType(file.getName()));
+            responseHeaders.setDate(new Date());
+            responseHeaders.setStatusLine("200 OK");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -119,4 +116,5 @@ public class JerryRat implements Runnable {
         JerryRat jerryRat = new JerryRat();
         new Thread(jerryRat).start();
     }
+
 }
