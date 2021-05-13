@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,14 +39,18 @@ public class JerryRat implements Runnable {
                 if (requestWrong(requestParts)) {
                     responseHeaders.setStatusLine("400 Bad Request");
                     responseHeaders.setDate(new Date());
+                    out.println("\r\n");
                     out.println(responseHeaders.toString());
+                    continue;
                 }
 
                 File file = getFile(requestParts[1]);
                 byte[] entityBody = getEntity(file);
 
+                out.println("\r\n");
                 out.println(responseHeaders.toString());
-                out.println(entityBody.toString());
+                out.println("\r\n");
+                out.println(new String(entityBody));
 
             } catch (IOException e) {
                 e.printStackTrace();
