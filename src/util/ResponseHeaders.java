@@ -11,6 +11,7 @@ public class ResponseHeaders {
     String contentLength;
     String contentType;
     String lastModified;
+    String userAgent;
 
     //headers
     List<String> headers;
@@ -18,13 +19,12 @@ public class ResponseHeaders {
 
     public ResponseHeaders() {
         headers = new ArrayList<>();
-        this.server = "Server: JerryRat";
-        this.statusLine = "HTTP/1.0 200 OK";
     }
 
-    private void collectHeaders() {
+    private void updateHeaders() {
         headers.add(statusLine);
         headers.add(date);
+        server = "Server: JerryRat";
         headers.add(server);
         headers.add(contentLength);
         headers.add(contentType);
@@ -64,7 +64,7 @@ public class ResponseHeaders {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        collectHeaders();
+        updateHeaders();
 
         for (String header : headers) {
             if (header != null) {

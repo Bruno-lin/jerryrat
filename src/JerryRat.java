@@ -3,16 +3,16 @@ import util.ResponseHeaders;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class JerryRat implements Runnable {
 
     public static final String SERVER_PORT = "8080";
     public static final String WEB_ROOT = "res/webroot";
+    //组成
+    private final Condition condition = new Condition();
     ServerSocket serverSocket;
     ResponseHeaders responseHeaders;
 
@@ -23,6 +23,7 @@ public class JerryRat implements Runnable {
 
     @Override
     public void run() {
+        //noinspection InfiniteLoopStatement
         while (true) {
             try (
                     Socket clientSocket = serverSocket.accept();
@@ -32,85 +33,45 @@ public class JerryRat implements Runnable {
                 responseHeaders = new ResponseHeaders();
 
                 String request = in.readLine();
-                String[] requestParts = request.split(" ");
+                String[] requestParts = request.trim().split("\\s+");
 
-                if (requestIllegal(requestParts)) {
+                if (condition.requestIllegal(requestParts)) {
                     responseHeaders.setStatusLine("400 Bad Request");
                     responseHeaders.setDate(new Date());
                     out.print(responseHeaders.toString());
+                    out.flush();
                     continue;
                 }
 
-                File file = getFile(requestParts[1]);
-                byte[] entityBody = getEntityBody(file);
+                if (requestParts[1].equals("/endpoints/user-agent")) {
+                    String[] headerLine = in.readLine().split(":");
+                    String value = headerLine[1].trim();
 
-                out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
+                    if (!value.equals("") && !condition.isOldVersion(requestParts[2])) {
+                        responseHeaders.setContentType(condition.getContentType(".txt"));
+                        responseHeaders.setContentLength(value.getBytes(StandardCharsets.UTF_8).length);
+                        responseHeaders.setLastModified(new Date());
+                        responseHeaders.setStatusLine("200 OK");
+                    }
+                    out.print(responseHeaders.toString() + "\r\n\r\n" + "User-Agent: " + value);
+                    out.flush();
+                    continue;
+                }
 
+                File file = condition.getFile(requestParts[1]);
+                byte[] entityBody = condition.getEntityBody(file, this);
+
+                if (!condition.isOldVersion(requestParts[2])) {
+                    out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
+                } else {
+                    out.print(new String(entityBody));
+                }
                 out.flush();
             } catch (IOException e) {
                 e.printStackTrace();
                 System.err.println("TCP连接错误！");
             }
         }
-    }
-
-    //获取文件
-    private File getFile(String requestPart) {
-        File file = new File(WEB_ROOT + requestPart);
-        if (!file.isFile()) {
-            file = new File(file + "/index.html");
-        }
-        return file;
-    }
-
-    //获取文件内容
-    private byte[] getEntityBody(File file) {
-        byte[] entityBody = null;
-        try {
-            entityBody = Files.readAllBytes(file.toPath());
-            responseHeaders.setLastModified(new Date(file.lastModified()));
-            responseHeaders.setContentLength(entityBody.length);
-            responseHeaders.setContentType(getContentType(file.getName()));
-            responseHeaders.setDate(new Date());
-            responseHeaders.setStatusLine("200 OK");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return entityBody;
-    }
-
-    //请求不合法
-    private boolean requestIllegal(String[] requestParts) {
-        return requestParts.length < 3 ||
-                !requestParts[0].equalsIgnoreCase("get") ||
-                !requestParts[2].equalsIgnoreCase("HTTP/1.0");
-    }
-
-    //获取文件的内容类型
-    private String getContentType(String content) throws Exception {
-        Map<String, String> map = new HashMap<>();
-        File file = new File("res/webroot/mime.txt");
-        BufferedReader br = new BufferedReader(new FileReader(file));
-
-        while (true) {
-            String attr = br.readLine();
-            if (attr == null) {
-                break;
-            }
-            String[] attrs = attr.split("\\s+");
-            map.put(attrs[0], attrs[1]);
-        }
-        return matchType(content, map);
-    }
-
-    //匹配且返回对应的类型
-    private String matchType(String content, Map<String, String> map) {
-        String[] name = content.split("\\.");
-        String key = name[name.length - 1];
-        if (map.get("." + key) == null) {
-            return "application/octet-stream";
-        }
-        return map.get("." + key);
     }
 
     public static void main(String[] args) throws IOException {
