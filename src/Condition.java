@@ -25,6 +25,13 @@ public class Condition {
         return file;
     }
 
+    //HEAD方法
+    boolean isHead(String[] requestParts) {
+        return requestParts.length == 3 ||
+                requestParts[0].equalsIgnoreCase("HEAD") ||
+                requestParts[2].equalsIgnoreCase("HTTP/1.0");
+    }
+
     //请求不合法
     boolean requestIllegal(String[] requestParts) {
         return requestParts.length != 3 ||

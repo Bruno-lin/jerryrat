@@ -38,7 +38,13 @@ public class JerryRat implements Runnable {
                 byte[] entityBody = condition.getEntityBody(file, this);
 
                 if (condition.isSimpleRequest(requestParts)) {
-                    out.println(new String(entityBody));
+                    out.print(new String(entityBody));
+                    out.flush();
+                    continue;
+                }
+
+                if (condition.isHead(requestParts)) {
+                    out.print(responseHeaders.toString());
                     out.flush();
                     continue;
                 }
