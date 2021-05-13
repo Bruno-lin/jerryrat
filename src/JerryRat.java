@@ -47,12 +47,11 @@ public class JerryRat implements Runnable {
                     String[] headerLine = in.readLine().split(":");
                     String value = headerLine[1].trim();
 
-                    if (!value.equals("") && !condition.isOldVersion(requestParts[2])) {
-                        responseHeaders.setContentType(condition.getContentType(".txt"));
-                        responseHeaders.setContentLength(value.getBytes(StandardCharsets.UTF_8).length);
-                        responseHeaders.setLastModified(new Date());
-                        responseHeaders.setStatusLine("200 OK");
-                    }
+                    responseHeaders.setContentType(condition.getContentType(".txt"));
+                    responseHeaders.setContentLength(value.getBytes(StandardCharsets.UTF_8).length);
+                    responseHeaders.setLastModified(new Date());
+                    responseHeaders.setStatusLine("200 OK");
+
                     out.print(responseHeaders.toString() + "\r\n\r\n" + value);
                     out.flush();
                     continue;
