@@ -21,7 +21,6 @@ public class ResponseHeaders {
 
     public ResponseHeaders() {
         headers = new ArrayList<>();
-        this.date = "Date: " + getDate(new Date());
         this.server = "Server: JerryRat";
         this.statusLine = "HTTP/1.0 200 OK";
     }
