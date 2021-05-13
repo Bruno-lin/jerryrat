@@ -3,7 +3,6 @@ import util.ResponseHeaders;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,7 +26,7 @@ public class JerryRat implements Runnable {
         while (true) {
             try (
                     Socket clientSocket = serverSocket.accept();
-                    BufferedOutputStream out = new BufferedOutputStream(clientSocket.getOutputStream());
+                    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ) {
                 responseHeaders = new ResponseHeaders();
@@ -38,19 +37,15 @@ public class JerryRat implements Runnable {
                 if (requestIllegal(requestParts)) {
                     responseHeaders.setStatusLine("400 Bad Request");
                     responseHeaders.setDate(new Date());
-                    out.write(responseHeaders.toString().getBytes(StandardCharsets.UTF_8));
+                    out.print(responseHeaders.toString());
                     continue;
                 }
 
                 File file = getFile(requestParts[1]);
                 byte[] entityBody = getEntityBody(file);
 
-                out.write(responseHeaders.toString().getBytes(StandardCharsets.UTF_8));
+                out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
 
-                if (entityBody != null) {
-                    out.write("\r\n\r\n".getBytes(StandardCharsets.UTF_8));
-                    out.write(entityBody);
-                }
                 out.flush();
             } catch (IOException e) {
                 e.printStackTrace();
