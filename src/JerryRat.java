@@ -96,9 +96,7 @@ public class JerryRat implements Runnable {
                 break;
             }
             String[] attrs = attr.split("\\s+");
-            for (int i = 0; i < attrs.length; i += 2) {
-                map.put(attrs[i], attrs[i + 1]);
-            }
+            map.put(attrs[0],attrs[1]);
         }
         return getType(content, map);
     }
@@ -106,10 +104,10 @@ public class JerryRat implements Runnable {
     private String getType(String content, Map<String, String> map) {
         String[] name = content.split("\\.");
         String key = name[name.length - 1];
-        if (!map.containsKey(key)) {
+        if (map.get("." + key) == null) {
             return "application/octet-stream";
         }
-        return map.get(key);
+        return map.get("." + key);
     }
 
     public static void main(String[] args) throws IOException {
