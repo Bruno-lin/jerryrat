@@ -37,14 +37,14 @@ public class JerryRat implements Runnable {
                 if (requestIllegal(requestParts)) {
                     responseHeaders.setStatusLine("400 Bad Request");
                     responseHeaders.setDate(new Date());
-                    out.println(responseHeaders.toString());
+                    out.print(responseHeaders.toString());
                     continue;
                 }
 
                 File file = getFile(requestParts[1]);
                 byte[] entityBody = getEntityBody(file);
 
-                out.println(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
+                out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
                 out.flush();
             } catch (IOException e) {
                 e.printStackTrace();
