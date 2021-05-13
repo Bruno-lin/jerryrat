@@ -51,6 +51,7 @@ public class JerryRat implements Runnable {
                     out.write("\r\n\r\n".getBytes(StandardCharsets.UTF_8));
                     out.write(entityBody);
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
                 System.err.println("TCP连接错误！");
@@ -109,7 +110,7 @@ public class JerryRat implements Runnable {
         String[] name = content.split("\\.");
         String key = name[name.length - 1];
         if (!map.containsKey(key)) {
-            return map.get(".*");
+            return "application/octet-stream";
         }
         return map.get(key);
     }
