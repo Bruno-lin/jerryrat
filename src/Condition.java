@@ -4,7 +4,6 @@ import java.io.FileReader;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,14 +21,8 @@ public class Condition {
         if (!file.isFile()) {
             file = new File(file + "/index.html");
         }
-        return file;
-    }
 
-    //HEAD方法
-    boolean isHead(String[] requestParts) {
-        return requestParts.length == 3 ||
-                requestParts[0].equalsIgnoreCase("HEAD") ||
-                requestParts[2].equalsIgnoreCase("HTTP/1.0");
+        return file;
     }
 
     //请求不合法
@@ -71,11 +64,12 @@ public class Condition {
 
     //获取文件内容
     byte[] getEntityBody(File file) {
-        byte[] entityBody = null;
+        byte[] entityBody;
         try {
             entityBody = Files.readAllBytes(file.toPath());
         } catch (Exception e) {
             e.printStackTrace();
+            entityBody = null;
         }
         return entityBody;
     }

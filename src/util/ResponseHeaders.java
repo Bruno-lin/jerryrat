@@ -8,6 +8,9 @@ public class ResponseHeaders {
     String statusLine;
     String date;
     String server;
+
+
+    String location;
     String contentLength;
     String contentType;
     String lastModified;
@@ -23,11 +26,16 @@ public class ResponseHeaders {
     private void updateHeaders() {
         headers.add(statusLine);
         headers.add(date);
-        server = "Server: JerryRat";
+        server = "Server: JerryRat/1.0";
         headers.add(server);
+        headers.add(location);
         headers.add(contentLength);
         headers.add(contentType);
         headers.add(lastModified);
+    }
+
+    public void setLocation(String location) {
+        this.location = "Location: " + location;
     }
 
     public void setDate(Date date) {
