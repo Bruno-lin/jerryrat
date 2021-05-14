@@ -69,13 +69,12 @@ public class JerryRat implements Runnable {
 
                         String filed = headerLine[0].trim();
                         int value = Integer.parseInt(headerLine[1].trim());
+                        char[] readLimited = new char[value];
 
                         if (filed.equalsIgnoreCase("Content-Length")) {
-                            String matchValue = in.readLine();
-                            if (value == matchValue.length()) {
-                                writer.write(matchValue);
-                                writer.close();
-                            }
+                            in.read(readLimited);
+                            writer.write(readLimited);
+                            writer.close();
                         }
                         responseHeaders.setStatusLine("201 Created");
                         responseHeaders.setDate(new Date());
