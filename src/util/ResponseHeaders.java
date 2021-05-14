@@ -8,9 +8,8 @@ public class ResponseHeaders {
     String statusLine;
     String date;
     String server;
-
-
     String location;
+    String wwwAuthenticate;
     String contentLength;
     String contentType;
     String lastModified;
@@ -32,6 +31,10 @@ public class ResponseHeaders {
         headers.add(contentLength);
         headers.add(contentType);
         headers.add(lastModified);
+    }
+
+    public void setWwwAuthenticate(String wwwAuthenticate) {
+        this.wwwAuthenticate = "WWW-Authenticate: " + wwwAuthenticate;
     }
 
     public void setLocation(String location) {
