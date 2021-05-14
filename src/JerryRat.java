@@ -64,7 +64,7 @@ public class JerryRat implements Runnable {
                             file_under_email.createNewFile();
                         }
 
-                        BufferedWriter writer = new BufferedWriter(new FileWriter(file_under_email, true));
+                        BufferedWriter writer = new BufferedWriter(new FileWriter(file_under_email));
                         String[] headerLine = in.readLine().trim().split(":");
 
                         String filed = headerLine[0].trim();
@@ -73,7 +73,7 @@ public class JerryRat implements Runnable {
                         if (filed.equalsIgnoreCase("Content-Length")) {
                             String matchValue = in.readLine();
                             if (value == matchValue.length()) {
-                                writer.append(matchValue);
+                                writer.write(matchValue);
                                 writer.close();
                             }
                         }
