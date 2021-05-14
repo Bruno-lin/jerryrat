@@ -75,6 +75,12 @@ public class JerryRat implements Runnable {
                         out.print(responseHeaders.toString());
                         out.flush();
                         continue;
+                    } else {
+                        responseHeaders.setStatusLine("400 Bad Request");
+                        responseHeaders.setDate(new Date());
+                        out.print(responseHeaders.toString());
+                        out.flush();
+                        continue;
                     }
                 }
 
