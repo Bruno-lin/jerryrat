@@ -25,6 +25,7 @@ public class ResponseHeaders {
     private void updateHeaders() {
         headers.add(statusLine);
         headers.add(date);
+        headers.add(wwwAuthenticate);
         server = "Server: JerryRat/1.0";
         headers.add(server);
         headers.add(location);

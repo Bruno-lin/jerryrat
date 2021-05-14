@@ -6,7 +6,6 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Locale;
 
 
 public class JerryRat implements Runnable {
@@ -92,20 +91,19 @@ public class JerryRat implements Runnable {
                         out.print(responseHeaders.toString());
                         out.flush();
                         continue;
-
                     } else if (requestParts[1].startsWith("/endpoints/null")) {
                         responseHeaders.setStatusLine("204 No Content");
                         responseHeaders.setDate(new Date());
                         out.print(responseHeaders.toString());
                         out.flush();
                         continue;
+                    } else {
+                        responseHeaders.setStatusLine("400 Bad Request");
+                        responseHeaders.setDate(new Date());
+                        out.print(responseHeaders.toString());
+                        out.flush();
+                        continue;
                     }
-                } else {
-                    responseHeaders.setStatusLine("400 Bad Request");
-                    responseHeaders.setDate(new Date());
-                    out.print(responseHeaders.toString());
-                    out.flush();
-                    continue;
                 }
 
                 // HTTP/0.9 GET 请求
@@ -113,6 +111,43 @@ public class JerryRat implements Runnable {
                     out.print(new String(entityBody));
                     out.flush();
                     continue;
+                }
+
+                if (requestParts[0].equalsIgnoreCase("GET") && requestParts[1].equals("/secret.txt")) {
+                    String[] splitHeader = in.readLine().trim().split(":");
+                    String filed = "";
+                    String value = "";
+                    
+                    if (splitHeader.length >= 2) {
+                        filed = splitHeader[0].trim();
+                        value = splitHeader[1].trim();
+                    }
+
+                    if (filed.equalsIgnoreCase("Authorization")) {
+                        String authorization = value.substring(5, value.length() - 1);
+                        String decoded = new String(Base64.getDecoder().decode(authorization), StandardCharsets.UTF_8);
+                        String[] userInfo = decoded.trim().split(":");
+                        if (userInfo[0].equals("hello") && userInfo[1].equals("world")) {
+                            responseHeaders.setStatusLine("200 OK");
+                            responseHeaders.setDate(new Date());
+                            out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
+                            out.flush();
+                            continue;
+                        } else {
+                            responseHeaders.setStatusLine("403 Forbidden");
+                            responseHeaders.setDate(new Date());
+                            out.print(responseHeaders.toString());
+                            out.flush();
+                            continue;
+                        }
+                    } else {
+                        responseHeaders.setStatusLine("401 Unauthorized");
+                        responseHeaders.setWwwAuthenticate("Basic realm=\"adalab\"");
+                        responseHeaders.setDate(new Date());
+                        out.print(responseHeaders.toString());
+                        out.flush();
+                        continue;
+                    }
                 }
 
                 //请求不合法
@@ -129,40 +164,6 @@ public class JerryRat implements Runnable {
 
                 //HTTP/1.0 GET请求
                 if (requestGet(out, requestParts, file, entityBody)) continue;
-
-                if (requestParts[0].equalsIgnoreCase("GET") && requestParts[1].equals("/secret.txt")) {
-                    String[] splitHeader = in.readLine().trim().split(":");
-
-                    String filed = splitHeader[0].trim();
-                    String value = splitHeader[1].trim();
-
-                    if (filed.equalsIgnoreCase("Authorization")) {
-                        String basic = value.substring(4);
-                        String authorization = value.substring(5, value.length() - 1);
-                        String decoded = new String(Base64.getDecoder().decode(authorization), StandardCharsets.UTF_8);
-                        String[] userInfo = decoded.trim().split(":");
-                        if (userInfo[0].equals("hello") && userInfo[1].equals("world")) {
-                            responseHeaders.setStatusLine("200 OK");
-                            responseHeaders.setDate(new Date());
-                            out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
-                            out.flush();
-                            continue;
-                        }else {
-                            responseHeaders.setStatusLine("403 Forbidden");
-                            responseHeaders.setDate(new Date());
-                            out.print(responseHeaders.toString());
-                            out.flush();
-                            continue;
-                        }
-                    } else {
-                        responseHeaders.setStatusLine("401 Unauthorized");
-                        responseHeaders.setWwwAuthenticate("Basic realm=\"adalab\"");
-                        responseHeaders.setDate(new Date());
-                        out.print(responseHeaders.toString());
-                        out.flush();
-                        continue;
-                    }
-                }
 
             } catch (IOException e) {
                 e.printStackTrace();
