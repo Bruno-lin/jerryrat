@@ -35,6 +35,9 @@ public class JerryRat implements Runnable {
                 String request = in.readLine();
                 String[] requestParts = request.trim().split("\\s+");
 
+                //方法未实现
+                if (notHaveMethod(out, requestParts)) continue;
+
                 if (requestParts[0].equalsIgnoreCase("POST")) {
                     if (requestParts.length == 3 && requestParts[2].equalsIgnoreCase("HTTP/1.0")) {
                         if (requestParts[1].startsWith("/emails")) {
@@ -91,8 +94,8 @@ public class JerryRat implements Runnable {
 
 
                 //HTTP/1.0 GET请求 没有entity
-                if (request_contain_useragent(out, in, requestParts)) continue;
-                if (request_redirect(out, requestParts)) continue;
+                if (requestUserAgent(out, in, requestParts)) continue;
+                if (requestRedirect(out, requestParts)) continue;
 
                 //没有资源
                 if (entityBody == null) {
@@ -120,17 +123,11 @@ public class JerryRat implements Runnable {
                 }
 
                 //HTTP/1.0 HEAD 请求
-                if (request_head(out, requestParts)) continue;
+                if (requestHead(out, requestParts)) continue;
 
                 //HTTP/1.0 GET请求
-                if (request_get(out, requestParts, file, entityBody)) continue;
+                if (requestGet(out, requestParts, file, entityBody)) continue;
 
-                else {
-                    responseHeaders.setStatusLine("501 Not Implemented");
-                    responseHeaders.setDate(new Date());
-                    out.print(responseHeaders.toString());
-                    out.flush();
-                }
             } catch (IOException e) {
                 e.printStackTrace();
                 System.err.println("TCP连接错误！");
@@ -138,7 +135,20 @@ public class JerryRat implements Runnable {
         }
     }
 
-    private boolean request_redirect(PrintWriter out, String[] requestParts) {
+    private boolean notHaveMethod(PrintWriter out, String[] requestParts) {
+        if (!requestParts[0].equalsIgnoreCase("GET") &&
+                !requestParts[0].equalsIgnoreCase("POST") &&
+                !requestParts[0].equalsIgnoreCase("HEAD")) {
+            responseHeaders.setStatusLine("501 Not Implemented");
+            responseHeaders.setDate(new Date());
+            out.print(responseHeaders.toString());
+            out.flush();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean requestRedirect(PrintWriter out, String[] requestParts) {
         if (requestParts[0].equalsIgnoreCase("GET") && requestParts[1].equals("/endpoints/redirect")) {
             responseHeaders.setLocation("http://localhost/");
             responseHeaders.setStatusLine("301 Moved Permanently");
@@ -150,7 +160,7 @@ public class JerryRat implements Runnable {
         return false;
     }
 
-    private boolean request_head(PrintWriter out, String[] requestParts) {
+    private boolean requestHead(PrintWriter out, String[] requestParts) {
         if (requestParts[0].equalsIgnoreCase("HEAD")) {
             out.print(responseHeaders.toString());
             out.flush();
@@ -159,7 +169,7 @@ public class JerryRat implements Runnable {
         return false;
     }
 
-    private boolean request_contain_useragent(PrintWriter out, BufferedReader in, String[] requestParts) throws IOException {
+    private boolean requestUserAgent(PrintWriter out, BufferedReader in, String[] requestParts) throws IOException {
         if (requestParts[0].equalsIgnoreCase("GET") && requestParts[1].equals("/endpoints/user-agent")) {
             String[] headerLine = in.readLine().split(":");
             String value = headerLine[1].trim();
@@ -176,7 +186,7 @@ public class JerryRat implements Runnable {
         return false;
     }
 
-    private boolean request_get(PrintWriter out, String[] requestParts, File file, byte[] entityBody) {
+    private boolean requestGet(PrintWriter out, String[] requestParts, File file, byte[] entityBody) {
         if (requestParts[0].equalsIgnoreCase("GET")) {
             responseHeaders.setLastModified(new Date(file.lastModified()));
             responseHeaders.setContentLength(entityBody.length);
