@@ -29,7 +29,7 @@ public class JerryRat implements Runnable {
                     PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ) {
-                clientSocket.setSoTimeout(10000);
+                clientSocket.setSoTimeout(50000);
 
                 responseHeaders = new ResponseHeaders();
                 String request = in.readLine();
@@ -65,15 +65,17 @@ public class JerryRat implements Runnable {
                             file_under_email.createNewFile();
                         }
 
-                        BufferedWriter writer = new BufferedWriter(new FileWriter(file_under_email));
+
                         String[] headerLine = in.readLine().trim().split(":");
 
                         String filed = headerLine[0].trim();
                         int contentLen = Integer.parseInt(headerLine[1].trim());
-                        char[] readLimited = new char[contentLen];
+                        char[] readLimited = new char[contentLen + 2];
 
                         if (filed.equalsIgnoreCase("Content-Length")) {
                             in.read(readLimited);
+
+                            BufferedWriter writer = new BufferedWriter(new FileWriter(file_under_email));
                             writer.write(readLimited);
                             writer.close();
                         }
