@@ -35,46 +35,48 @@ public class JerryRat implements Runnable {
                 String request = in.readLine();
                 String[] requestParts = request.trim().split("\\s+");
 
-                if (requestParts[0].equalsIgnoreCase("POST") && requestParts.length == 3 && requestParts[2].equalsIgnoreCase("HTTP/1.0")) {
-                    if (requestParts[1].startsWith("/emails")) {
-                        File directory = new File(WEB_ROOT, "/emails");
-                        if (!directory.exists()) {
-                            directory.mkdirs();
-                        }
-                        File file_under_email = new File(WEB_ROOT, requestParts[1]);
-                        if (!file_under_email.exists()) {
-                            file_under_email.createNewFile();
-                        }
+                if (requestParts[0].equalsIgnoreCase("POST")) {
+                    if (requestParts.length == 3 && requestParts[2].equalsIgnoreCase("HTTP/1.0")) {
+                        if (requestParts[1].startsWith("/emails")) {
+                            File directory = new File(WEB_ROOT, "/emails");
+                            if (!directory.exists()) {
+                                directory.mkdirs();
+                            }
+                            File file_under_email = new File(WEB_ROOT, requestParts[1]);
+                            if (!file_under_email.exists()) {
+                                file_under_email.createNewFile();
+                            }
 
-                        String[] headerLine = in.readLine().trim().split(":");
+                            String[] headerLine = in.readLine().trim().split(":");
 
-                        String filed = headerLine[0].trim();
-                        char[] readLimited = new char[0];
-                        if (headerLine.length == 2) {
-                            int contentLen = Integer.parseInt(headerLine[1].trim());
-                            readLimited = new char[contentLen + 2];
+                            String filed = headerLine[0].trim();
+                            char[] readLimited = new char[0];
+                            if (headerLine.length == 2) {
+                                int contentLen = Integer.parseInt(headerLine[1].trim());
+                                readLimited = new char[contentLen + 2];
+                            }
+
+                            if (filed.equalsIgnoreCase("Content-Length")) {
+                                in.read(readLimited);
+                                BufferedWriter writer = new BufferedWriter(new FileWriter(file_under_email));
+                                writer.write(readLimited);
+                                writer.close();
+                                responseHeaders.setStatusLine("201 Created");
+                            } else {
+                                responseHeaders.setStatusLine("400 Bad Request");
+                            }
+                            responseHeaders.setDate(new Date());
+                            out.print(responseHeaders.toString());
+                            out.flush();
+                            continue;
+
+                        } else if (requestParts[1].startsWith("/endpoints/null")) {
+                            responseHeaders.setStatusLine("204 No Content");
+                            responseHeaders.setDate(new Date());
+                            out.print(responseHeaders.toString());
+                            out.flush();
+                            continue;
                         }
-
-                        if (filed.equalsIgnoreCase("Content-Length")) {
-                            in.read(readLimited);
-                            BufferedWriter writer = new BufferedWriter(new FileWriter(file_under_email));
-                            writer.write(readLimited);
-                            writer.close();
-                            responseHeaders.setStatusLine("201 Created");
-                        } else {
-                            responseHeaders.setStatusLine("400 Bad Request");
-                        }
-                        responseHeaders.setDate(new Date());
-                        out.print(responseHeaders.toString());
-                        out.flush();
-                        continue;
-
-                    } else if (requestParts[1].startsWith("/endpoints/null")) {
-                        responseHeaders.setStatusLine("204 No Content");
-                        responseHeaders.setDate(new Date());
-                        out.print(responseHeaders.toString());
-                        out.flush();
-                        continue;
                     } else {
                         responseHeaders.setStatusLine("400 Bad Request");
                         responseHeaders.setDate(new Date());
