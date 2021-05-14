@@ -35,7 +35,6 @@ public class Condition {
     //请求不合法
     boolean requestIllegal(String[] requestParts) {
         return requestParts.length != 3 ||
-                !requestParts[0].equalsIgnoreCase("GET") ||
                 !requestParts[2].equalsIgnoreCase("HTTP/1.0");
     }
 
@@ -71,15 +70,10 @@ public class Condition {
     }
 
     //获取文件内容
-    byte[] getEntityBody(File file, JerryRat jerryRat) {
+    byte[] getEntityBody(File file) {
         byte[] entityBody = null;
         try {
             entityBody = Files.readAllBytes(file.toPath());
-            jerryRat.responseHeaders.setLastModified(new Date(file.lastModified()));
-            jerryRat.responseHeaders.setContentLength(entityBody.length);
-            jerryRat.responseHeaders.setContentType(getContentType(file.getName()));
-            jerryRat.responseHeaders.setDate(new Date());
-            jerryRat.responseHeaders.setStatusLine("200 OK");
         } catch (Exception e) {
             e.printStackTrace();
         }
