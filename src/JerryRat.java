@@ -52,7 +52,7 @@ public class JerryRat implements Runnable {
                         char[] readLimited = new char[0];
                         if (headerLine.length == 2) {
                             int contentLen = Integer.parseInt(headerLine[1].trim());
-                            readLimited = new char[contentLen];
+                            readLimited = new char[contentLen + 2];
                         }
 
                         if (filed.equalsIgnoreCase("Content-Length")) {
@@ -114,7 +114,7 @@ public class JerryRat implements Runnable {
                 //HTTP/1.0 HEAD 请求
                 if (request_head(out, requestParts)) continue;
 
-
+                //HTTP/1.0 GET请求
                 if (request_get(out, requestParts, file, entityBody)) continue;
 
                 else {
