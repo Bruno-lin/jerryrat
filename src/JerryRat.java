@@ -35,174 +35,178 @@ public class JerryRat implements Runnable {
                 String request = in.readLine();
                 String[] requestParts = request.trim().split("\\s+");
 
+                File file = condition.getFile(requestParts[1]);
+                byte[] entityBody = condition.getEntityBody(file);
+
                 //方法未实现
                 if (notHaveMethod(out, requestParts)) continue;
 
                 if (requestParts[0].equalsIgnoreCase("POST")) {
                     if (requestParts.length == 3 && requestParts[2].equalsIgnoreCase("HTTP/1.0")) {
+
                         if (requestParts[1].startsWith("/emails")) {
                             File directory = new File(WEB_ROOT, "/emails");
                             if (!directory.exists()) {
                                 directory.mkdirs();
                             }
-                            File file_under_email = new File(WEB_ROOT, requestParts[1]);
-                            if (!file_under_email.exists()) {
-                                file_under_email.createNewFile();
+                            file = new File(WEB_ROOT, requestParts[1]);
+                            if (!file.exists()) {
+                                file.createNewFile();
                             }
-
-                            String[] headerLine = in.readLine().trim().split(":");
-
-                            String filed = headerLine[0].trim();
-                            char[] readLimited = new char[0];
-                            if (headerLine.length == 2) {
-                                int contentLen = Integer.parseInt(headerLine[1].trim());
-                                readLimited = new char[contentLen + 2];
-                            }
-
-                            if (filed.equalsIgnoreCase("Content-Length")) {
-                                in.read(readLimited);
-                                BufferedWriter writer = new BufferedWriter(new FileWriter(file_under_email));
-                                writer.write(readLimited);
-                                writer.close();
-                                responseHeaders.setStatusLine("201 Created");
-                            } else {
-                                responseHeaders.setStatusLine("400 Bad Request");
-                            }
-                            responseHeaders.setDate(new Date());
-                            out.print(responseHeaders.toString());
-                            out.flush();
-                            continue;
-
-                        } else if (requestParts[1].startsWith("/endpoints/null")) {
-                            responseHeaders.setStatusLine("204 No Content");
-                            responseHeaders.setDate(new Date());
-                            out.print(responseHeaders.toString());
-                            out.flush();
-                            continue;
                         }
-                    } else {
-                        responseHeaders.setStatusLine("400 Bad Request");
+                        String[] headerLine = in.readLine().trim().split(":");
+
+                        String filed = headerLine[0].trim();
+                        char[] readLimited = new char[0];
+                        if (headerLine.length == 2) {
+                            int contentLen = Integer.parseInt(headerLine[1].trim());
+                            readLimited = new char[contentLen + 2];
+                        }
+
+                        if (filed.equalsIgnoreCase("Content-Length")) {
+                            in.read(readLimited);
+                            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                            writer.write(readLimited);
+                            writer.close();
+                            responseHeaders.setStatusLine("201 Created");
+                        } else {
+                            responseHeaders.setStatusLine("400 Bad Request");
+                        }
+                        responseHeaders.setDate(new Date());
+                        out.print(responseHeaders.toString());
+                        out.flush();
+                        continue;
+
+                    } else if (requestParts[1].startsWith("/endpoints/null")) {
+                        responseHeaders.setStatusLine("204 No Content");
                         responseHeaders.setDate(new Date());
                         out.print(responseHeaders.toString());
                         out.flush();
                         continue;
                     }
-                }
-
-                File file = condition.getFile(requestParts[1]);
-                byte[] entityBody = condition.getEntityBody(file);
-
-
-                //HTTP/1.0 GET请求 没有entity
-                if (requestUserAgent(out, in, requestParts)) continue;
-                if (requestRedirect(out, requestParts)) continue;
-
-                //没有资源
-                if (entityBody == null) {
-                    responseHeaders.setStatusLine("404 Not Found");
-                    responseHeaders.setDate(new Date());
-                    out.print(responseHeaders);
-                    out.flush();
-                    continue;
-                }
-
-                // HTTP/0.9 GET 请求
-                if (condition.isSimpleRequest(requestParts)) {
-                    out.print(new String(entityBody));
-                    out.flush();
-                    continue;
-                }
-
-                //请求不合法
-                if (condition.requestIllegal(requestParts)) {
-                    responseHeaders.setStatusLine("400 Bad Request");
-                    responseHeaders.setDate(new Date());
-                    out.print(responseHeaders.toString());
-                    out.flush();
-                    continue;
-                }
-
-                //HTTP/1.0 HEAD 请求
-                if (requestHead(out, requestParts)) continue;
-
-                //HTTP/1.0 GET请求
-                if (requestGet(out, requestParts, file, entityBody)) continue;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("TCP连接错误！");
+            } else{
+                responseHeaders.setStatusLine("400 Bad Request");
+                responseHeaders.setDate(new Date());
+                out.print(responseHeaders.toString());
+                out.flush();
+                continue;
             }
-        }
-    }
 
-    private boolean notHaveMethod(PrintWriter out, String[] requestParts) {
-        if (!requestParts[0].equalsIgnoreCase("GET") &&
-                !requestParts[0].equalsIgnoreCase("POST") &&
-                !requestParts[0].equalsIgnoreCase("HEAD")) {
-            responseHeaders.setStatusLine("501 Not Implemented");
+
+        //HTTP/1.0 GET请求 没有entity
+        if (requestUserAgent(out, in, requestParts)) continue;
+        if (requestRedirect(out, requestParts)) continue;
+
+        //没有资源
+        if (entityBody == null) {
+            responseHeaders.setStatusLine("404 Not Found");
+            responseHeaders.setDate(new Date());
+            out.print(responseHeaders);
+            out.flush();
+            continue;
+        }
+
+        // HTTP/0.9 GET 请求
+        if (condition.isSimpleRequest(requestParts)) {
+            out.print(new String(entityBody));
+            out.flush();
+            continue;
+        }
+
+        //请求不合法
+        if (condition.requestIllegal(requestParts)) {
+            responseHeaders.setStatusLine("400 Bad Request");
             responseHeaders.setDate(new Date());
             out.print(responseHeaders.toString());
             out.flush();
-            return true;
+            continue;
         }
-        return false;
+
+        //HTTP/1.0 HEAD 请求
+        if (requestHead(out, requestParts)) continue;
+
+        //HTTP/1.0 GET请求
+        if (requestGet(out, requestParts, file, entityBody)) continue;
+
+    } catch(
+    IOException e)
+
+    {
+        e.printStackTrace();
+        System.err.println("TCP连接错误！");
     }
-
-    private boolean requestRedirect(PrintWriter out, String[] requestParts) {
-        if (requestParts[0].equalsIgnoreCase("GET") && requestParts[1].equals("/endpoints/redirect")) {
-            responseHeaders.setLocation("http://localhost/");
-            responseHeaders.setStatusLine("301 Moved Permanently");
-            responseHeaders.setDate(new Date());
-            out.print(responseHeaders.toString());
-            out.flush();
-            return true;
-        }
-        return false;
-    }
-
-    private boolean requestHead(PrintWriter out, String[] requestParts) {
-        if (requestParts[0].equalsIgnoreCase("HEAD")) {
-            out.print(responseHeaders.toString());
-            out.flush();
-            return true;
-        }
-        return false;
-    }
-
-    private boolean requestUserAgent(PrintWriter out, BufferedReader in, String[] requestParts) throws IOException {
-        if (requestParts[0].equalsIgnoreCase("GET") && requestParts[1].equals("/endpoints/user-agent")) {
-            String[] headerLine = in.readLine().split(":");
-            String value = headerLine[1].trim();
-
-            responseHeaders.setContentType(condition.getContentType(".txt"));
-            responseHeaders.setContentLength(value.length());
-            responseHeaders.setLastModified(new Date());
-            responseHeaders.setStatusLine("200 OK");
-
-            out.print(responseHeaders.toString() + "\r\n\r\n" + value);
-            out.flush();
-            return true;
-        }
-        return false;
-    }
-
-    private boolean requestGet(PrintWriter out, String[] requestParts, File file, byte[] entityBody) {
-        if (requestParts[0].equalsIgnoreCase("GET")) {
-            responseHeaders.setLastModified(new Date(file.lastModified()));
-            responseHeaders.setContentLength(entityBody.length);
-            responseHeaders.setContentType(condition.getContentType(file.getName()));
-            responseHeaders.setDate(new Date());
-            responseHeaders.setStatusLine("200 OK");
-            out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
-            out.flush();
-            return true;
-        }
-        return false;
-    }
-
-    public static void main(String[] args) throws IOException {
-        JerryRat jerryRat = new JerryRat();
-        new Thread(jerryRat).start();
-    }
+}
 
 }
+
+private boolean notHaveMethod(PrintWriter out,String[]requestParts){
+        if(!requestParts[0].equalsIgnoreCase("GET")&&
+        !requestParts[0].equalsIgnoreCase("POST")&&
+        !requestParts[0].equalsIgnoreCase("HEAD")){
+        responseHeaders.setStatusLine("501 Not Implemented");
+        responseHeaders.setDate(new Date());
+        out.print(responseHeaders.toString());
+        out.flush();
+        return true;
+        }
+        return false;
+        }
+
+private boolean requestRedirect(PrintWriter out,String[]requestParts){
+        if(requestParts[0].equalsIgnoreCase("GET")&&requestParts[1].equals("/endpoints/redirect")){
+        responseHeaders.setLocation("http://localhost/");
+        responseHeaders.setStatusLine("301 Moved Permanently");
+        responseHeaders.setDate(new Date());
+        out.print(responseHeaders.toString());
+        out.flush();
+        return true;
+        }
+        return false;
+        }
+
+private boolean requestHead(PrintWriter out,String[]requestParts){
+        if(requestParts[0].equalsIgnoreCase("HEAD")){
+        out.print(responseHeaders.toString());
+        out.flush();
+        return true;
+        }
+        return false;
+        }
+
+private boolean requestUserAgent(PrintWriter out,BufferedReader in,String[]requestParts)throws IOException{
+        if(requestParts[0].equalsIgnoreCase("GET")&&requestParts[1].equals("/endpoints/user-agent")){
+        String[]headerLine=in.readLine().split(":");
+        String value=headerLine[1].trim();
+
+        responseHeaders.setContentType(condition.getContentType(".txt"));
+        responseHeaders.setContentLength(value.length());
+        responseHeaders.setLastModified(new Date());
+        responseHeaders.setStatusLine("200 OK");
+
+        out.print(responseHeaders.toString()+"\r\n\r\n"+value);
+        out.flush();
+        return true;
+        }
+        return false;
+        }
+
+private boolean requestGet(PrintWriter out,String[]requestParts,File file,byte[]entityBody){
+        if(requestParts[0].equalsIgnoreCase("GET")){
+        responseHeaders.setLastModified(new Date(file.lastModified()));
+        responseHeaders.setContentLength(entityBody.length);
+        responseHeaders.setContentType(condition.getContentType(file.getName()));
+        responseHeaders.setDate(new Date());
+        responseHeaders.setStatusLine("200 OK");
+        out.print(responseHeaders.toString()+"\r\n\r\n"+new String(entityBody));
+        out.flush();
+        return true;
+        }
+        return false;
+        }
+
+public static void main(String[]args)throws IOException{
+        JerryRat jerryRat=new JerryRat();
+        new Thread(jerryRat).start();
+        }
+
+        }
