@@ -34,18 +34,37 @@ public class JerryRat implements Runnable {
                 String request = in.readLine();
                 String[] requestParts = request.trim().split("\\s+");
 
+                File file = condition.getFile(requestParts[1]);
+                byte[] entityBody = condition.getEntityBody(file);
+
+                // HTTP/0.9 GET 请求
+                if (condition.isSimpleRequest(requestParts)) {
+                    out.print(new String(entityBody));
+                    out.flush();
+                    continue;
+                }
+
+                //请求不合法
+                if (condition.requestIllegal(requestParts)) {
+                    responseHeaders.setStatusLine("400 Bad Request");
+                    responseHeaders.setDate(new Date());
+                    out.print(responseHeaders.toString());
+                    out.flush();
+                    continue;
+                }
+
                 if (requestParts[0].equalsIgnoreCase("POST")) {
                     if (requestParts[1].startsWith("/emails")) {
                         File directory = new File(WEB_ROOT, "/emails");
                         if (!directory.exists()) {
                             directory.mkdirs();
                         }
-                        File file = new File(WEB_ROOT, requestParts[1]);
-                        if (!file.exists()) {
-                            file.createNewFile();
+                        File file_under_email = new File(WEB_ROOT, requestParts[1]);
+                        if (!file_under_email.exists()) {
+                            file_under_email.createNewFile();
                         }
 
-                        BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+                        BufferedWriter writer = new BufferedWriter(new FileWriter(file_under_email, true));
                         String[] headerLine = in.readLine().trim().split(":");
 
                         String filed = headerLine[0].trim();
@@ -70,25 +89,6 @@ public class JerryRat implements Runnable {
                         out.flush();
                         continue;
                     }
-                }
-
-                File file = condition.getFile(requestParts[1]);
-                byte[] entityBody = condition.getEntityBody(file);
-
-                // HTTP/0.9 GET 请求
-                if (condition.isSimpleRequest(requestParts)) {
-                    out.print(new String(entityBody));
-                    out.flush();
-                    continue;
-                }
-
-                //请求不合法
-                if (condition.requestIllegal(requestParts)) {
-                    responseHeaders.setStatusLine("400 Bad Request");
-                    responseHeaders.setDate(new Date());
-                    out.print(responseHeaders.toString());
-                    out.flush();
-                    continue;
                 }
 
                 //HTTP/1.0 HEAD 请求
