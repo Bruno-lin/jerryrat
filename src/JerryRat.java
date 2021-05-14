@@ -29,8 +29,9 @@ public class JerryRat implements Runnable {
                     PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ) {
-                responseHeaders = new ResponseHeaders();
+                clientSocket.setSoTimeout(10000);
 
+                responseHeaders = new ResponseHeaders();
                 String request = in.readLine();
                 String[] requestParts = request.trim().split("\\s+");
 
@@ -68,8 +69,8 @@ public class JerryRat implements Runnable {
                         String[] headerLine = in.readLine().trim().split(":");
 
                         String filed = headerLine[0].trim();
-                        int value = Integer.parseInt(headerLine[1].trim());
-                        char[] readLimited = new char[value];
+                        int contentLen = Integer.parseInt(headerLine[1].trim());
+                        char[] readLimited = new char[contentLen];
 
                         if (filed.equalsIgnoreCase("Content-Length")) {
                             in.read(readLimited);
