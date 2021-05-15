@@ -37,6 +37,8 @@ public class JerryRat implements Runnable {
                 String request = in.readLine();
                 String[] requestParts = request.trim().split("\\s+");
 
+
+
                 //方法未实现
                 if (notHaveMethod(out, requestParts)) continue;
 
@@ -46,6 +48,8 @@ public class JerryRat implements Runnable {
 
                 File file = condition.getFile(requestParts[1]);
                 byte[] entityBody = condition.getEntityBody(file);
+
+                if (requestHead(out, requestParts)) continue;
 
                 //没有资源
                 if (entityBody == null) {
@@ -156,7 +160,6 @@ public class JerryRat implements Runnable {
                 }
 
                 //HTTP/1.0 HEAD 请求
-                if (requestHead(out, requestParts)) continue;
 
                 //HTTP/1.0 GET请求
                 if (requestGet(out, requestParts, file, entityBody)) continue;
