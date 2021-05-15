@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 
 
 public class JerryRat implements Runnable {
@@ -118,19 +119,23 @@ public class JerryRat implements Runnable {
                 }
 
                 if (requestParts[0].equalsIgnoreCase("GET") && requestParts[1].equals("/secret.txt")) {
-                    String[] splitHeader = in.readLine().trim().split(":");
-                    String filed = "";
-                    String value = "";
-
-                    if (splitHeader.length >= 2) {
-                        filed = splitHeader[0].trim();
-                        value = splitHeader[1].trim();
+                    HashMap<String, String> map = new HashMap<>();
+                    String splitHeader;
+                    while (!(splitHeader = in.readLine()).equals("")) {
+                        System.out.println(splitHeader);
+                        String[] split1 = splitHeader.split(":");
+                        if (split1.length == 2) {
+                            map.put(split1[0], split1[1]);
+                        }
                     }
 
                     try {
-                        if (filed.equalsIgnoreCase("Authorization")) {
-                            String authorization = value.substring(6, value.length() - 1).trim();
-                            String decoded = new String(Base64.getDecoder().decode(authorization), StandardCharsets.UTF_8);
+                        if (map.containsKey("Authorization")) {
+                            String authorization = map.get("Authorization");
+                            String[] s1 = authorization.split(" ");
+                            String userAndPassword = s1[s1.length - 1];
+
+                            String decoded = new String(Base64.getDecoder().decode(userAndPassword), StandardCharsets.UTF_8);
                             String[] userInfo = decoded.trim().split(":");
                             if (userInfo[0].equals("hello") && userInfo[1].equals("world")) {
                                 responseHeaders.setStatusLine("200 OK");
