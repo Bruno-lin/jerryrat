@@ -140,22 +140,22 @@ public class JerryRat implements Runnable {
                             if (userInfo[0].equals("hello") && userInfo[1].equals("world")) {
                                 responseHeaders.setStatusLine("200 OK");
                                 responseHeaders.setDate(new Date());
-                                out.print("\r\n" + responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
+                                out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
                             } else {
                                 responseHeaders.setStatusLine("403 Forbidden");
                                 responseHeaders.setDate(new Date());
-                                out.print("\r\n" +responseHeaders.toString());
+                                out.print(responseHeaders.toString());
                             }
                         } else {
                             responseHeaders.setStatusLine("401 Unauthorized");
                             responseHeaders.setWwwAuthenticate("Basic realm=\"adalab\"");
                             responseHeaders.setDate(new Date());
-                            out.print("\r\n" +responseHeaders.toString());
+                            out.print(responseHeaders.toString());
                         }
                     } catch (Exception e) {
                         responseHeaders.setStatusLine("403 Forbidden");
                         responseHeaders.setDate(new Date());
-                        out.print("\r\n" + responseHeaders.toString());
+                        out.print(responseHeaders.toString());
                     }
                     out.flush();
                     continue;
@@ -165,7 +165,7 @@ public class JerryRat implements Runnable {
                 if (condition.requestIllegal(requestParts)) {
                     responseHeaders.setStatusLine("400 Bad Request");
                     responseHeaders.setDate(new Date());
-                    out.print("\r\n" + responseHeaders.toString());
+                    out.print(responseHeaders.toString());
                     out.flush();
                     continue;
                 }
