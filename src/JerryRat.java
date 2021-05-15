@@ -79,7 +79,7 @@ public class JerryRat implements Runnable {
                         char[] readLimited = new char[0];
                         if (headerLine.length == 2) {
                             int contentLen = Integer.parseInt(headerLine[1].trim());
-                            readLimited = new char[contentLen + 2];
+                            readLimited = new char[contentLen];
                         }
 
                         if (filed.equalsIgnoreCase("Content-Length")) {
@@ -127,24 +127,30 @@ public class JerryRat implements Runnable {
                         value = splitHeader[1].trim();
                     }
 
-                    if (filed.equalsIgnoreCase("Authorization")) {
-                        String authorization = value.substring(6, value.length() - 1).trim();
-                        String decoded = new String(Base64.getDecoder().decode(authorization), StandardCharsets.UTF_8);
-                        String[] userInfo = decoded.trim().split(":");
-                        if (userInfo[0].equals("hello") && userInfo[1].equals("world")) {
-                            responseHeaders.setStatusLine("200 OK");
-                            responseHeaders.setDate(new Date());
-                            out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
+                    try {
+                        if (filed.equalsIgnoreCase("Authorization")) {
+                            String authorization = value.substring(6, value.length() - 1).trim();
+                            String decoded = new String(Base64.getDecoder().decode(authorization), StandardCharsets.UTF_8);
+                            String[] userInfo = decoded.trim().split(":");
+                            if (userInfo[0].equals("hello") && userInfo[1].equals("world")) {
+                                responseHeaders.setStatusLine("200 OK");
+                                responseHeaders.setDate(new Date());
+                                out.print("\r\n" + responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
+                            } else {
+                                responseHeaders.setStatusLine("403 Forbidden");
+                                responseHeaders.setDate(new Date());
+                                out.print("\r\n" +responseHeaders.toString());
+                            }
                         } else {
-                            responseHeaders.setStatusLine("403 Forbidden");
+                            responseHeaders.setStatusLine("401 Unauthorized");
+                            responseHeaders.setWwwAuthenticate("Basic realm=\"adalab\"");
                             responseHeaders.setDate(new Date());
-                            out.print(responseHeaders.toString());
+                            out.print("\r\n" +responseHeaders.toString());
                         }
-                    } else {
-                        responseHeaders.setStatusLine("401 Unauthorized");
-                        responseHeaders.setWwwAuthenticate("Basic realm=\"adalab\"");
+                    } catch (Exception e) {
+                        responseHeaders.setStatusLine("403 Forbidden");
                         responseHeaders.setDate(new Date());
-                        out.print(responseHeaders.toString());
+                        out.print("\r\n" + responseHeaders.toString());
                     }
                     out.flush();
                     continue;
@@ -154,7 +160,7 @@ public class JerryRat implements Runnable {
                 if (condition.requestIllegal(requestParts)) {
                     responseHeaders.setStatusLine("400 Bad Request");
                     responseHeaders.setDate(new Date());
-                    out.print(responseHeaders.toString());
+                    out.print("\r\n" + responseHeaders.toString());
                     out.flush();
                     continue;
                 }
