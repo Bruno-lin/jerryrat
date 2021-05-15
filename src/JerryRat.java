@@ -124,30 +124,26 @@ public class JerryRat implements Runnable {
                     }
 
                     if (filed.equalsIgnoreCase("Authorization")) {
-                        String authorization = value.substring(5, value.length() - 1);
+                        String authorization = value.substring(6, value.length() - 1).trim();
                         String decoded = new String(Base64.getDecoder().decode(authorization), StandardCharsets.UTF_8);
                         String[] userInfo = decoded.trim().split(":");
                         if (userInfo[0].equals("hello") && userInfo[1].equals("world")) {
                             responseHeaders.setStatusLine("200 OK");
                             responseHeaders.setDate(new Date());
                             out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
-                            out.flush();
-                            continue;
                         } else {
                             responseHeaders.setStatusLine("403 Forbidden");
                             responseHeaders.setDate(new Date());
                             out.print(responseHeaders.toString());
-                            out.flush();
-                            continue;
                         }
                     } else {
                         responseHeaders.setStatusLine("401 Unauthorized");
                         responseHeaders.setWwwAuthenticate("Basic realm=\"adalab\"");
                         responseHeaders.setDate(new Date());
                         out.print(responseHeaders.toString());
-                        out.flush();
-                        continue;
                     }
+                    out.flush();
+                    continue;
                 }
 
                 //请求不合法

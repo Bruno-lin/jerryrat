@@ -4,6 +4,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class EchoServer implements Runnable {
     public static final String SERVER_PORT = "3456";
@@ -33,7 +35,9 @@ public class EchoServer implements Runnable {
     }
 
     public static void main(String[] args) throws IOException {
-        EchoServer echoServer = new EchoServer();
-        new Thread(echoServer).run();
+//        EchoServer echoServer = new EchoServer();
+//        new Thread(echoServer).run();
+        String decoded = new String(Base64.getDecoder().decode("aGVsbG86d29ybGQ="), StandardCharsets.UTF_8);
+        System.out.println(decoded);
     }
 }
