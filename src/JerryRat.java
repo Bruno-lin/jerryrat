@@ -38,7 +38,6 @@ public class JerryRat implements Runnable {
                 String[] requestParts = request.trim().split("\\s+");
 
 
-
                 //方法未实现
                 if (notHaveMethod(out, requestParts)) continue;
 
@@ -121,7 +120,7 @@ public class JerryRat implements Runnable {
                     String[] splitHeader = in.readLine().trim().split(":");
                     String filed = "";
                     String value = "";
-                    
+
                     if (splitHeader.length >= 2) {
                         filed = splitHeader[0].trim();
                         value = splitHeader[1].trim();
@@ -198,7 +197,8 @@ public class JerryRat implements Runnable {
     }
 
     private boolean requestHead(PrintWriter out, String[] requestParts) {
-        if (requestParts[0].equalsIgnoreCase("HEAD")) {
+        if (requestParts[0].equalsIgnoreCase("HEAD") ||
+                requestParts[2].equalsIgnoreCase("HTTP/1.0")) {
             out.print(responseHeaders.toString());
             out.flush();
             return true;
