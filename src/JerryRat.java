@@ -196,7 +196,7 @@ public class JerryRat implements Runnable {
     }
 
     private boolean requestHead(PrintWriter out, String[] requestParts) {
-        if (requestParts.length == 3 ||requestParts[0].equalsIgnoreCase("HEAD") ||
+        if (requestParts.length == 3 && requestParts[0].equalsIgnoreCase("HEAD") &&
                 requestParts[2].equalsIgnoreCase("HTTP/1.0")) {
             responseHeaders.setStatusLine("200 OK");
             responseHeaders.setDate(new Date());
