@@ -140,7 +140,10 @@ public class JerryRat implements Runnable {
                             if (userInfo[0].equals("hello") && userInfo[1].equals("world")) {
                                 responseHeaders.setStatusLine("200 OK");
                                 responseHeaders.setDate(new Date());
-                                out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody));
+                                responseHeaders.setLastModified(new Date(file.lastModified()));
+                                responseHeaders.setContentLength(entityBody.length);
+                                responseHeaders.setContentType(condition.getContentType(file.getName()));                                responseHeaders.setDate(new Date());
+                                out.print(responseHeaders.toString() + "\r\n\r\n" + new String(entityBody) );
                             } else {
                                 responseHeaders.setStatusLine("403 Forbidden");
                                 responseHeaders.setDate(new Date());
