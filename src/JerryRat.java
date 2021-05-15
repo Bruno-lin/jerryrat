@@ -48,7 +48,7 @@ public class JerryRat implements Runnable {
                 File file = condition.getFile(requestParts[1]);
                 byte[] entityBody = condition.getEntityBody(file);
 
-                //头请求
+                //HTTP/1.0 HEAD 请求
                 if (requestHead(out, requestParts)) continue;
 
                 //没有资源
@@ -159,8 +159,6 @@ public class JerryRat implements Runnable {
                     continue;
                 }
 
-                //HTTP/1.0 HEAD 请求
-
                 //HTTP/1.0 GET请求
                 if (requestGet(out, requestParts, file, entityBody)) continue;
 
@@ -200,6 +198,8 @@ public class JerryRat implements Runnable {
     private boolean requestHead(PrintWriter out, String[] requestParts) {
         if (requestParts.length == 3 ||requestParts[0].equalsIgnoreCase("HEAD") ||
                 requestParts[2].equalsIgnoreCase("HTTP/1.0")) {
+            responseHeaders.setStatusLine("200 OK");
+            responseHeaders.setDate(new Date());
             out.print(responseHeaders.toString());
             out.flush();
             return true;
