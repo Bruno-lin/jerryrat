@@ -48,6 +48,7 @@ public class JerryRat implements Runnable {
                 File file = condition.getFile(requestParts[1]);
                 byte[] entityBody = condition.getEntityBody(file);
 
+                //头请求
                 if (requestHead(out, requestParts)) continue;
 
                 //没有资源
